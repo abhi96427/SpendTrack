@@ -56,7 +56,7 @@ The database file is `spendtrack.db` in the platform's application database dire
 Clone the repository, then run the following from its root:
 
 ```bash
-git clone <repository-url> spendtrack
+git clone https://github.com/abhi96427/SpendTrack.git
 cd spendtrack
 flutter doctor
 flutter pub get
