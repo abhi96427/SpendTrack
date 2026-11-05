@@ -119,6 +119,20 @@ docs/screenshots/ # UI screenshots (demonstration data)
 
 Screenshots use demonstration data for illustration. The installed app starts without seeded expenses.
 
+## Application Screenshots
+
+![SpendTrack dashboard](docs/screenshots/dashboard.png)
+*Dashboard — spending totals, recent transactions, and trends.*
+
+![Add expense screen](docs/screenshots/add-expense.png)
+*Add Expense — enter an amount, category, date, and optional note.*
+
+![Expense details screen](docs/screenshots/expense-details.png)
+*Expense Details — review a saved transaction and its information.*
+
+![Monthly summary screen](docs/screenshots/summary.png)
+*Summary — monthly spending and category analytics.*
+
 ## Verification
 
 Latest verified project checks:
