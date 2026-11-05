@@ -136,6 +136,24 @@ The automated suite covers expense and settings persistence, database reopen beh
 2. P. Pavan Kumar Reddy
 3. P. Charan
 
+### Individual Contributions
+
+- **M. Abhiram — Project Lead & Frontend Development**
+  - Project planning and architecture
+  - Flutter UI/UX and screen development
+  - Provider state management and feature integration
+  - Navigation, theme integration and final deployment
+- **P. Pavan Kumar Reddy — Database & Expense Management**
+  - SQLite database design and integration
+  - Expense and income CRUD operations
+  - Data validation and local persistence
+  - Search, filtering and sorting
+- **P. Charan — Analytics, Testing & Documentation**
+  - Dashboard and expense summaries
+  - Monthly and category-wise analytics
+  - Charts and graphical reports
+  - Testing, bug fixing and documentation
+
 ## Repository and security notes
 
 - Expense and app preference data are stored locally in the app's private database.
