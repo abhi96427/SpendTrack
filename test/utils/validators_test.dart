@@ -28,6 +28,12 @@ void main() {
       expect(validateExpenseAmount('abc'), 'Enter a valid number.');
     });
 
+    test('rejects non-finite amounts', () {
+      expect(validateExpenseAmount('NaN'), 'Enter a valid number.');
+      expect(validateExpenseAmount('Infinity'), 'Enter a valid number.');
+      expect(validateExpenseAmount('-Infinity'), 'Enter a valid number.');
+    });
+
     test('rejects zero and negative amounts', () {
       expect(validateExpenseAmount('0'), 'Amount must be greater than zero.');
       expect(
@@ -54,9 +60,11 @@ void main() {
       expect(parseAmount(' 42 '), 42);
     });
 
-    test('returns null for invalid input', () {
+    test('returns null for invalid or non-finite input', () {
       expect(parseAmount(''), isNull);
       expect(parseAmount('not a number'), isNull);
+      expect(parseAmount('NaN'), isNull);
+      expect(parseAmount('Infinity'), isNull);
     });
   });
 }

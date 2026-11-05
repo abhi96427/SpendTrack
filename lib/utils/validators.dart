@@ -18,7 +18,7 @@ String? validateExpenseAmount(String? value) {
   }
 
   final amount = parseAmount(text);
-  if (amount == null) {
+  if (amount == null || !amount.isFinite) {
     return 'Enter a valid number.';
   }
   if (amount <= 0) {
@@ -31,10 +31,14 @@ String? validateExpenseAmount(String? value) {
 }
 
 /// Parses user-entered amounts, tolerating thousands separators.
+///
+/// Non-finite values such as `NaN` or `Infinity` are rejected because they
+/// would poison every total and chart derived from the saved records.
 double? parseAmount(String value) {
   final normalized = value.replaceAll(',', '').trim();
   if (normalized.isEmpty) {
     return null;
   }
-  return double.tryParse(normalized);
+  final amount = double.tryParse(normalized);
+  return amount != null && amount.isFinite ? amount : null;
 }
