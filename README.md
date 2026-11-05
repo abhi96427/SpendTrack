@@ -159,7 +159,7 @@ The automated suite covers expense and settings persistence, database reopen beh
   - Navigation, theme integration and final deployment
 - **P. Pavan Kumar Reddy — Database & Expense Management**
   - SQLite database design and integration
-  - Expense and income CRUD operations
+  - Expense CRUD operations
   - Data validation and local persistence
   - Search, filtering and sorting
 - **P. Charan — Analytics, Testing & Documentation**
