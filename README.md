@@ -144,6 +144,26 @@ Latest verified project checks:
 
 The automated suite covers expense and settings persistence, database reopen behavior, filtering and sorting, Provider updates and rollback, analytics, charts, UI flows, theme/currency selection, and confirmed clear-all behavior.
 
+## Download and Install APK
+
+SpendTrack is available as an Android APK for direct installation without publishing it on the Google Play Store.
+
+### Download
+
+1. Open the [SpendTrack GitHub Releases](https://github.com/abhi96427/SpendTrack/releases) page.
+2. Open the latest release, **v1.0.0**.
+3. Download the `app-release.apk` file.
+
+### Installation on Android
+
+1. Transfer the downloaded APK to your Android phone if necessary.
+2. Open the APK file using your phone's file manager.
+3. If prompted, allow installation from that source in Android settings.
+4. Tap **Install**.
+5. Once installation is complete, open SpendTrack and start tracking your expenses.
+
+**Note:** SpendTrack stores expense and preference data locally on the device using SQLite.
+
 ## Project team
 
 1. M. Abhiram
