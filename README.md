@@ -130,6 +130,12 @@ Latest verified project checks:
 
 The automated suite covers expense and settings persistence, database reopen behavior, filtering and sorting, Provider updates and rollback, analytics, charts, UI flows, theme/currency selection, and confirmed clear-all behavior.
 
+## Project team
+
+1. M. Abhiram
+2. P. Pavan Kumar Reddy
+3. P. Charan
+
 ## Repository and security notes
 
 - Expense and app preference data are stored locally in the app's private database.
