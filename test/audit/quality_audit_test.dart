@@ -273,10 +273,7 @@ void main() {
       expect(find.text('Retry me'), findsOneWidget);
       expect(storage.stored, isEmpty);
 
-      // Let the snackbar clear so it no longer covers the retry action.
-      await tester.pump(const Duration(seconds: 5));
-      await tester.pumpAndSettle();
-
+      // The error snackbar must not cover the retry action.
       storage.failSave = false;
       await tester.tap(find.byKey(const Key('expense-save-button')));
       await tester.pumpAndSettle();

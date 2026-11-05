@@ -135,6 +135,9 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
+          // Keep the persistent save bar tappable while the error is visible.
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 88),
           content: Text(
             provider.errorMessage ?? 'Could not save the expense. Try again.',
           ),
@@ -200,6 +203,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 88),
           content: Text(
             provider.errorMessage ?? 'Could not delete the expense. Try again.',
           ),

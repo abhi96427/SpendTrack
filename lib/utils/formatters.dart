@@ -15,8 +15,14 @@ final DateFormat _compactDateFormatter = DateFormat('d MMM');
 String formatCurrency(num amount) => _currencyFormatter.format(amount);
 
 /// Compact currency used inside charts and small labels.
+///
+/// Small amounts keep decimal precision so a chart never renders a real
+/// balance as `₹0` just because it is less than one rupee.
 String formatCompactCurrency(num amount) {
   final value = amount.toDouble();
+  if (value <= 0) {
+    return '₹0';
+  }
   if (value >= 10000000) {
     return '₹${(value / 10000000).toStringAsFixed(1)}Cr';
   }
@@ -27,6 +33,12 @@ String formatCompactCurrency(num amount) {
     final thousands = value / 1000;
     final digits = thousands >= 10 ? 0 : 1;
     return '₹${thousands.toStringAsFixed(digits)}k';
+  }
+  if (value < 10) {
+    return '₹${value.toStringAsFixed(2)}';
+  }
+  if (value < 100) {
+    return '₹${value.toStringAsFixed(1)}';
   }
   return '₹${value.toStringAsFixed(0)}';
 }
