@@ -38,11 +38,15 @@ class EmptyStateView extends StatelessWidget {
           Container(
             width: compact ? 48 : 62,
             height: compact ? 48 : 62,
-            decoration: const BoxDecoration(
-              color: AppColors.accentSoft,
+            decoration: BoxDecoration(
+              color: context.palette.accentSoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: compact ? 22 : 28, color: AppColors.accent),
+            child: Icon(
+              icon,
+              size: compact ? 22 : 28,
+              color: context.palette.accent,
+            ),
           ),
           SizedBox(height: compact ? 12 : 16),
           Text(
@@ -57,7 +61,7 @@ class EmptyStateView extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.palette.textSecondary,
               height: 1.5,
             ),
           ),
@@ -66,13 +70,13 @@ class EmptyStateView extends StatelessWidget {
             if (filledAction)
               FilledButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.add_rounded, size: 19),
+                icon: Icon(Icons.add_rounded, size: 19),
                 label: Text(actionLabel!),
               )
             else
               TextButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.arrow_forward_rounded, size: 17),
+                icon: Icon(Icons.arrow_forward_rounded, size: 17),
                 label: Text(actionLabel!),
               ),
           ],

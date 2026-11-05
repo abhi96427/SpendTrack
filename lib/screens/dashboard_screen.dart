@@ -5,6 +5,7 @@ import '../models/expense.dart';
 import '../providers/expense_provider.dart';
 import '../theme/app_colors.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 import '../widgets/app_card.dart';
 import '../widgets/category_spending_list.dart';
 import '../widgets/empty_state_view.dart';
@@ -141,17 +142,17 @@ class _DashboardHeader extends StatelessWidget {
           width: 46,
           height: 46,
           decoration: BoxDecoration(
-            color: AppColors.navy,
+            color: context.palette.brand,
             borderRadius: BorderRadius.circular(15),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: AppColors.navy.withValues(alpha: 0.18),
+                color: context.palette.navy.withValues(alpha: 0.18),
                 blurRadius: 16,
                 offset: const Offset(0, 7),
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.account_balance_wallet_rounded,
             color: Colors.white,
             size: 23,
@@ -173,7 +174,7 @@ class _DashboardHeader extends StatelessWidget {
               Text(
                 formatFullDate(DateTime.now()),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.palette.textSecondary,
                 ),
               ),
             ],
@@ -207,14 +208,14 @@ class _TotalSpendingCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppColors.navy, AppColors.navyDeep],
+          colors: <Color>[context.palette.brand, context.palette.brandDeep],
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.24),
+            color: context.palette.navy.withValues(alpha: 0.24),
             blurRadius: 28,
             offset: const Offset(0, 14),
           ),
@@ -244,7 +245,7 @@ class _TotalSpendingCard extends StatelessWidget {
                 height: 145,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.accent.withValues(alpha: 0.14),
+                  color: context.palette.accent.withValues(alpha: 0.14),
                 ),
               ),
             ),
@@ -291,7 +292,7 @@ class _TotalSpendingCard extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      formatCurrency(totalAmount),
+                      formatCurrency(totalAmount, currency: context.currency),
                       style: theme.textTheme.displaySmall?.copyWith(
                         color: Colors.white,
                         fontSize: 40,
@@ -311,7 +312,10 @@ class _TotalSpendingCard extends StatelessWidget {
                       Expanded(
                         child: _HeroStat(
                           label: 'This month',
-                          value: formatCurrency(monthTotal),
+                          value: formatCurrency(
+                            monthTotal,
+                            currency: context.currency,
+                          ),
                         ),
                       ),
                       Container(
@@ -323,7 +327,10 @@ class _TotalSpendingCard extends StatelessWidget {
                       Expanded(
                         child: _HeroStat(
                           label: 'Today',
-                          value: formatCurrency(todayTotal),
+                          value: formatCurrency(
+                            todayTotal,
+                            currency: context.currency,
+                          ),
                         ),
                       ),
                     ],
@@ -336,13 +343,13 @@ class _TotalSpendingCard extends StatelessWidget {
                       onPressed: onAdd,
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: AppColors.navy,
+                        foregroundColor: context.palette.navy,
                         minimumSize: const Size.fromHeight(50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      icon: const Icon(Icons.add_rounded, size: 20),
+                      icon: Icon(Icons.add_rounded, size: 20),
                       label: const Text('Add expense'),
                     ),
                   ),

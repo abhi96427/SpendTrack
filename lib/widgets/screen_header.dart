@@ -32,7 +32,7 @@ class ScreenHeader extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.palette.textSecondary,
                   ),
                 ),
               ],

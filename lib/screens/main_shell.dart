@@ -10,8 +10,9 @@ import 'expense_detail_screen.dart';
 import 'expense_form_screen.dart';
 import 'expenses_screen.dart';
 import 'summary_screen.dart';
+import 'settings_screen.dart';
 
-/// Hosts the three primary tabs and the shared add/edit expense route.
+/// Hosts the primary tabs and the shared add/edit expense route.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -77,6 +78,7 @@ class _MainShellState extends State<MainShell> {
           ),
           ExpensesScreen(onOpenExpense: _openExpense),
           SummaryScreen(onOpenExpense: _openExpense),
+          const SettingsScreen(),
         ],
       ),
       bottomNavigationBar: _BottomNavigation(
@@ -100,11 +102,11 @@ class _BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        color: context.palette.surface,
+        border: Border(top: BorderSide(color: context.palette.border)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.06),
+            color: context.palette.navy.withValues(alpha: 0.06),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -115,7 +117,7 @@ class _BottomNavigation extends StatelessWidget {
         child: NavigationBar(
           selectedIndex: selectedIndex,
           onDestinationSelected: onSelected,
-          destinations: const <NavigationDestination>[
+          destinations: <NavigationDestination>[
             NavigationDestination(
               icon: Icon(Icons.space_dashboard_outlined),
               selectedIcon: Icon(Icons.space_dashboard_rounded),
@@ -130,6 +132,11 @@ class _BottomNavigation extends StatelessWidget {
               icon: Icon(Icons.pie_chart_outline_rounded),
               selectedIcon: Icon(Icons.pie_chart_rounded),
               label: 'Summary',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings_rounded),
+              label: 'Settings',
             ),
           ],
         ),
@@ -153,17 +160,17 @@ class _StartupView extends StatelessWidget {
             width: 66,
             height: 66,
             decoration: BoxDecoration(
-              color: AppColors.navy,
+              color: context.palette.brand,
               borderRadius: BorderRadius.circular(21),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: AppColors.navy.withValues(alpha: 0.22),
+                  color: context.palette.navy.withValues(alpha: 0.22),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.account_balance_wallet_rounded,
               color: Colors.white,
               size: 30,
@@ -175,7 +182,7 @@ class _StartupView extends StatelessWidget {
           Text(
             'Preparing your dashboard',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.palette.textSecondary,
             ),
           ),
           const SizedBox(height: 24),

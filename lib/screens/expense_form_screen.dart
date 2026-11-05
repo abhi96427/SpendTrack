@@ -9,6 +9,7 @@ import '../providers/expense_provider.dart';
 import '../theme/app_colors.dart';
 import '../utils/category_ui.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 import '../utils/validators.dart';
 import '../widgets/app_card.dart';
 
@@ -157,7 +158,7 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         return AlertDialog(
           title: const Text('Delete expense?'),
           content: Text(
-            '"${expense.title}" (${formatCurrency(expense.amount)}) will be '
+            '"${expense.title}" (${formatCurrency(expense.amount, currency: context.currency)}) will be '
             'removed permanently.',
           ),
           actions: <Widget>[
@@ -167,7 +168,9 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+              style: TextButton.styleFrom(
+                foregroundColor: context.palette.danger,
+              ),
               child: const Text('Delete'),
             ),
           ],
@@ -223,8 +226,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               key: const Key('expense-delete-button'),
               onPressed: _isSaving ? null : _delete,
               tooltip: 'Delete expense',
-              color: AppColors.danger,
-              icon: const Icon(Icons.delete_outline_rounded),
+              color: context.palette.danger,
+              icon: Icon(Icons.delete_outline_rounded),
             ),
           const SizedBox(width: 4),
         ],
@@ -340,7 +343,7 @@ class _AmountCard extends StatelessWidget {
                 child: Text(
                   'AMOUNT',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: context.palette.textMuted,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -387,20 +390,20 @@ class _AmountCard extends StatelessWidget {
               fontSize: 38,
               fontWeight: FontWeight.w800,
               letterSpacing: -1.2,
-              color: AppColors.navy,
+              color: context.palette.navy,
             ),
             decoration: InputDecoration(
               hintText: '0',
               hintStyle: theme.textTheme.displaySmall?.copyWith(
                 fontSize: 38,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textMuted.withValues(alpha: 0.45),
+                color: context.palette.textMuted.withValues(alpha: 0.45),
               ),
-              prefixText: '₹ ',
+              prefixText: '${context.readCurrency.symbol} ',
               prefixStyle: theme.textTheme.headlineSmall?.copyWith(
                 fontSize: 30,
                 fontWeight: FontWeight.w700,
-                color: AppColors.navy,
+                color: context.palette.navy,
               ),
               filled: false,
               contentPadding: const EdgeInsets.only(top: 4, bottom: 2),
@@ -410,7 +413,7 @@ class _AmountCard extends StatelessWidget {
               errorBorder: InputBorder.none,
               focusedErrorBorder: InputBorder.none,
               errorStyle: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.danger,
+                color: context.palette.danger,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -433,7 +436,7 @@ class _FieldLabel extends StatelessWidget {
     return Text(
       label.toUpperCase(),
       style: theme.textTheme.labelSmall?.copyWith(
-        color: AppColors.textMuted,
+        color: context.palette.textMuted,
         letterSpacing: 0.9,
       ),
     );
@@ -505,7 +508,7 @@ class _CategoryOption extends StatelessWidget {
       selected: selected,
       label: category.label,
       child: Material(
-        color: selected ? AppColors.accentSoft : AppColors.surface,
+        color: selected ? context.palette.accentSoft : context.palette.surface,
         borderRadius: radius,
         child: InkWell(
           onTap: enabled ? onTap : null,
@@ -516,7 +519,9 @@ class _CategoryOption extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: radius,
               border: Border.all(
-                color: selected ? AppColors.accent : AppColors.border,
+                color: selected
+                    ? context.palette.accent
+                    : context.palette.border,
                 width: selected ? 1.6 : 1,
               ),
             ),
@@ -549,8 +554,8 @@ class _CategoryOption extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: selected
-                                ? AppColors.accentDark
-                                : AppColors.textSecondary,
+                                ? context.palette.accentDark
+                                : context.palette.textSecondary,
                             fontWeight: selected
                                 ? FontWeight.w700
                                 : FontWeight.w600,
@@ -562,13 +567,13 @@ class _CategoryOption extends StatelessWidget {
                   ),
                 ),
                 if (selected)
-                  const Positioned(
+                  Positioned(
                     top: 0,
                     right: 0,
                     child: Icon(
                       Icons.check_circle_rounded,
                       size: 15,
-                      color: AppColors.accent,
+                      color: context.palette.accent,
                     ),
                   ),
               ],
@@ -597,7 +602,7 @@ class _DateField extends StatelessWidget {
     final radius = BorderRadius.circular(16);
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.surface,
       borderRadius: radius,
       child: InkWell(
         key: const Key('expense-date-field'),
@@ -607,7 +612,7 @@ class _DateField extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: radius,
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.palette.border),
           ),
           child: Row(
             children: <Widget>[
@@ -615,13 +620,13 @@ class _DateField extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.accentSoft,
+                  color: context.palette.accentSoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.calendar_today_rounded,
                   size: 18,
-                  color: AppColors.accent,
+                  color: context.palette.accent,
                 ),
               ),
               const SizedBox(width: 12),
@@ -632,7 +637,7 @@ class _DateField extends StatelessWidget {
                     Text(
                       'Expense date',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.textMuted,
+                        color: context.palette.textMuted,
                         letterSpacing: 0.4,
                       ),
                     ),
@@ -640,17 +645,17 @@ class _DateField extends StatelessWidget {
                     Text(
                       formatFullDate(date),
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
+                        color: context.palette.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 size: 20,
-                color: AppColors.textMuted,
+                color: context.palette.textMuted,
               ),
             ],
           ),
@@ -676,9 +681,9 @@ class _SaveBar extends StatelessWidget {
     final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.palette.surface,
+        border: Border(top: BorderSide(color: context.palette.border)),
       ),
       child: SafeArea(
         top: false,
@@ -697,7 +702,7 @@ class _SaveBar extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                : const Icon(Icons.check_rounded, size: 20),
+                : Icon(Icons.check_rounded, size: 20),
             label: Text(
               isSaving
                   ? 'Saving...'

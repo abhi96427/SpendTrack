@@ -30,7 +30,7 @@ class CategoryFilterBar extends StatelessWidget {
             key: Key('$keyPrefix-all'),
             label: 'All',
             icon: Icons.grid_view_rounded,
-            color: AppColors.navy,
+            color: context.palette.brand,
             selected: selected == null,
             onTap: () => onSelected(null),
           ),
@@ -72,7 +72,7 @@ class _FilterPill extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Material(
-      color: selected ? color : AppColors.surface,
+      color: selected ? color : context.palette.surface,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -81,7 +81,9 @@ class _FilterPill extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: selected ? color : AppColors.border),
+            border: Border.all(
+              color: selected ? color : context.palette.border,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -91,7 +93,9 @@ class _FilterPill extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.labelMedium?.copyWith(
-                  color: selected ? Colors.white : AppColors.textSecondary,
+                  color: selected
+                      ? Colors.white
+                      : context.palette.textSecondary,
                   fontWeight: FontWeight.w700,
                 ),
               ),

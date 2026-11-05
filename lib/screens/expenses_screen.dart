@@ -3,9 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../models/expense.dart';
 import '../models/expense_category.dart';
+import '../models/expense_sort.dart';
 import '../providers/expense_provider.dart';
 import '../theme/app_colors.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
+import '../utils/expense_filters.dart';
 import '../widgets/add_expense_button.dart';
 import '../widgets/app_card.dart';
 import '../widgets/category_filter_bar.dart';
@@ -30,9 +33,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   String _query = '';
   ExpenseCategory? _category;
   bool _thisMonthOnly = false;
+  DateTimeRange? _dateRange;
+  ExpenseSortOrder _sortOrder = ExpenseSortOrder.newest;
 
   bool get _hasFilters =>
-      _query.trim().isNotEmpty || _category != null || _thisMonthOnly;
+      _query.trim().isNotEmpty ||
+      _category != null ||
+      _thisMonthOnly ||
+      _dateRange != null;
 
   @override
   void dispose() {
@@ -41,31 +49,27 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   List<Expense> _filteredExpenses(ExpenseProvider provider) {
-    final query = _query.trim().toLowerCase();
-    final now = DateTime.now();
+    return filterExpenses(
+      expenses: provider.expenses,
+      query: _query,
+      category: _category,
+      currentMonthOnly: _thisMonthOnly,
+      from: _dateRange?.start,
+      to: _dateRange?.end,
+      sort: _sortOrder,
+    );
+  }
 
-    return provider.expenses
-        .where((expense) {
-          if (_thisMonthOnly &&
-              (expense.date.year != now.year ||
-                  expense.date.month != now.month)) {
-            return false;
-          }
-          if (_category != null && expense.category != _category) {
-            return false;
-          }
-          if (query.isNotEmpty) {
-            final searchable =
-                '${expense.title} ${expense.category.label} '
-                        '${expense.note ?? ''}'
-                    .toLowerCase();
-            if (!searchable.contains(query)) {
-              return false;
-            }
-          }
-          return true;
-        })
-        .toList(growable: false);
+  Future<void> _pickDateRange() async {
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(now.year, now.month, now.day),
+      initialDateRange: _dateRange,
+      helpText: 'Select expense date range',
+    );
+    if (picked != null && mounted) setState(() => _dateRange = picked);
   }
 
   Map<DateTime, List<Expense>> _groupByDay(List<Expense> expenses) {
@@ -87,6 +91,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       _query = '';
       _category = null;
       _thisMonthOnly = false;
+      _dateRange = null;
+      _sortOrder = ExpenseSortOrder.newest;
     });
   }
 
@@ -125,7 +131,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             onChanged: (value) => setState(() => _query = value),
             decoration: InputDecoration(
               hintText: 'Search by title, category or note',
-              prefixIcon: const Icon(Icons.search_rounded),
+              prefixIcon: Icon(Icons.search_rounded),
               suffixIcon: _query.isEmpty
                   ? null
                   : IconButton(
@@ -135,7 +141,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         setState(() => _query = '');
                       },
                       tooltip: 'Clear search',
-                      icon: const Icon(Icons.close_rounded, size: 19),
+                      icon: Icon(Icons.close_rounded, size: 19),
                     ),
             ),
           ),
@@ -146,6 +152,59 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             keyPrefix: 'expenses-category',
           ),
           const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  key: const Key('expenses-date-range'),
+                  onPressed: _pickDateRange,
+                  icon: Icon(Icons.date_range_rounded),
+                  label: Text(
+                    _dateRange == null
+                        ? 'Date range'
+                        : '${formatCompactDate(_dateRange!.start)} – ${formatCompactDate(_dateRange!.end)}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              PopupMenuButton<ExpenseSortOrder>(
+                key: const Key('expenses-sort-menu'),
+                initialValue: _sortOrder,
+                tooltip: 'Sort expenses',
+                onSelected: (order) => setState(() => _sortOrder = order),
+                itemBuilder: (_) => ExpenseSortOrder.values
+                    .map(
+                      (order) =>
+                          PopupMenuItem(value: order, child: Text(order.label)),
+                    )
+                    .toList(),
+                child: Row(
+                  children: [
+                    Icon(Icons.sort_rounded, color: context.palette.accent),
+                    const SizedBox(width: 5),
+                    Text(
+                      _sortOrder.shortLabel,
+                      style: TextStyle(color: context.palette.accent),
+                    ),
+                    Icon(
+                      Icons.arrow_drop_down_rounded,
+                      color: context.palette.accent,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (_dateRange != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                key: const Key('expenses-clear-date-range'),
+                onPressed: () => setState(() => _dateRange = null),
+                icon: Icon(Icons.close_rounded, size: 16),
+                label: const Text('Remove date range'),
+              ),
+            ),
           Row(
             children: <Widget>[
               Expanded(
@@ -161,22 +220,22 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       Icons.calendar_month_rounded,
                       size: 18,
                       color: _thisMonthOnly
-                          ? AppColors.accent
-                          : AppColors.textSecondary,
+                          ? context.palette.accent
+                          : context.palette.textSecondary,
                     ),
                     label: const Text('This month'),
                     labelStyle: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: _thisMonthOnly
-                          ? AppColors.accentDark
-                          : AppColors.textSecondary,
+                          ? context.palette.accentDark
+                          : context.palette.textSecondary,
                     ),
-                    selectedColor: AppColors.accentSoft,
-                    backgroundColor: AppColors.surface,
+                    selectedColor: context.palette.accentSoft,
+                    backgroundColor: context.palette.surface,
                     side: BorderSide(
                       color: _thisMonthOnly
-                          ? AppColors.accent.withValues(alpha: 0.45)
-                          : AppColors.border,
+                          ? context.palette.accent.withValues(alpha: 0.45)
+                          : context.palette.border,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -189,7 +248,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   key: const Key('expenses-clear-filters'),
                   onPressed: _clearFilters,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.textSecondary,
+                    foregroundColor: context.palette.textSecondary,
                     minimumSize: const Size(0, 36),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
@@ -235,36 +294,53 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           else ...<Widget>[
             _FilteredSummary(count: filtered.length, total: filteredTotal),
             const SizedBox(height: 22),
-            for (final entry in groups.entries) ...<Widget>[
-              _DayHeader(
-                day: entry.key,
-                total: entry.value.fold<double>(
-                  0,
-                  (total, expense) => total + expense.amount,
-                ),
-              ),
-              const SizedBox(height: 9),
+            if (_sortOrder == ExpenseSortOrder.highestAmount)
               AppCard(
                 padding: EdgeInsets.zero,
                 child: Column(
-                  children: <Widget>[
-                    for (
-                      var index = 0;
-                      index < entry.value.length;
-                      index++
-                    ) ...<Widget>[
+                  children: [
+                    for (var index = 0; index < filtered.length; index++) ...[
                       ExpenseTile(
-                        expense: entry.value[index],
-                        onTap: () => widget.onOpenExpense(entry.value[index]),
+                        expense: filtered[index],
+                        onTap: () => widget.onOpenExpense(filtered[index]),
                       ),
-                      if (index != entry.value.length - 1)
+                      if (index != filtered.length - 1)
                         const Divider(indent: 75, endIndent: 16),
                     ],
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+              )
+            else
+              for (final entry in groups.entries) ...<Widget>[
+                _DayHeader(
+                  day: entry.key,
+                  total: entry.value.fold<double>(
+                    0,
+                    (total, expense) => total + expense.amount,
+                  ),
+                ),
+                const SizedBox(height: 9),
+                AppCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    children: <Widget>[
+                      for (
+                        var index = 0;
+                        index < entry.value.length;
+                        index++
+                      ) ...<Widget>[
+                        ExpenseTile(
+                          expense: entry.value[index],
+                          onTap: () => widget.onOpenExpense(entry.value[index]),
+                        ),
+                        if (index != entry.value.length - 1)
+                          const Divider(indent: 75, endIndent: 16),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
           ],
         ],
       ),
@@ -283,8 +359,8 @@ class _FilteredSummary extends StatelessWidget {
     final theme = Theme.of(context);
 
     return AppCard(
-      backgroundColor: AppColors.accentSoft,
-      borderColor: AppColors.accent.withValues(alpha: 0.12),
+      backgroundColor: context.palette.accentSoft,
+      borderColor: context.palette.accent.withValues(alpha: 0.12),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
       borderRadius: 18,
       child: Row(
@@ -296,10 +372,10 @@ class _FilteredSummary extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.filter_alt_rounded,
               size: 19,
-              color: AppColors.accent,
+              color: context.palette.accent,
             ),
           ),
           const SizedBox(width: 12),
@@ -307,15 +383,15 @@ class _FilteredSummary extends StatelessWidget {
             child: Text(
               count == 1 ? '1 transaction shown' : '$count transactions shown',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.navySoft,
+                color: context.palette.navySoft,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
           Text(
-            formatCurrency(total),
+            formatCurrency(total, currency: context.currency),
             style: theme.textTheme.titleMedium?.copyWith(
-              color: AppColors.navy,
+              color: context.palette.navy,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -341,14 +417,14 @@ class _DayHeader extends StatelessWidget {
           child: Text(
             formatRelativeDate(day),
             style: theme.textTheme.labelLarge?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.palette.textSecondary,
             ),
           ),
         ),
         Text(
-          formatCurrency(total),
+          formatCurrency(total, currency: context.currency),
           style: theme.textTheme.labelMedium?.copyWith(
-            color: AppColors.textMuted,
+            color: context.palette.textMuted,
             fontWeight: FontWeight.w700,
           ),
         ),

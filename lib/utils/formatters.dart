@@ -1,10 +1,19 @@
 import 'package:intl/intl.dart';
 
-final NumberFormat _currencyFormatter = NumberFormat.currency(
-  locale: 'en_IN',
-  symbol: '₹',
-  decimalDigits: 2,
-);
+import '../models/app_currency.dart';
+
+final Map<AppCurrency, NumberFormat> _currencyFormatters =
+    <AppCurrency, NumberFormat>{};
+
+NumberFormat _formatterFor(AppCurrency currency) {
+  return _currencyFormatters.putIfAbsent(currency, () {
+    return NumberFormat.currency(
+      locale: currency.locale,
+      symbol: currency.symbol,
+      decimalDigits: currency.decimalDigits,
+    );
+  });
+}
 
 final DateFormat _shortDateFormatter = DateFormat('d MMM yyyy');
 final DateFormat _fullDateFormatter = DateFormat('d MMMM yyyy');
@@ -12,35 +21,49 @@ final DateFormat _monthYearFormatter = DateFormat('MMMM yyyy');
 final DateFormat _shortMonthFormatter = DateFormat('MMM');
 final DateFormat _compactDateFormatter = DateFormat('d MMM');
 
-String formatCurrency(num amount) => _currencyFormatter.format(amount);
+String formatCurrency(num amount, {AppCurrency currency = AppCurrency.inr}) =>
+    _formatterFor(currency).format(amount);
 
 /// Compact currency used inside charts and small labels.
 ///
-/// Small amounts keep decimal precision so a chart never renders a real
-/// balance as `₹0` just because it is less than one rupee.
-String formatCompactCurrency(num amount) {
+/// INR keeps its familiar crore/lakh/thousand suffixes. Other currencies use
+/// the locale-aware compact notation so foreign amounts remain readable.
+String formatCompactCurrency(
+  num amount, {
+  AppCurrency currency = AppCurrency.inr,
+}) {
   final value = amount.toDouble();
   if (value <= 0) {
-    return '₹0';
+    return '${currency.symbol}0';
   }
-  if (value >= 10000000) {
-    return '₹${(value / 10000000).toStringAsFixed(1)}Cr';
+
+  if (currency == AppCurrency.inr) {
+    if (value >= 10000000) {
+      return '${currency.symbol}${(value / 10000000).toStringAsFixed(1)}Cr';
+    }
+    if (value >= 100000) {
+      return '${currency.symbol}${(value / 100000).toStringAsFixed(1)}L';
+    }
+    if (value >= 1000) {
+      final thousands = value / 1000;
+      final digits = thousands >= 10 ? 0 : 1;
+      return '${currency.symbol}${thousands.toStringAsFixed(digits)}k';
+    }
+    if (value < 10) {
+      return '${currency.symbol}${value.toStringAsFixed(2)}';
+    }
+    if (value < 100) {
+      return '${currency.symbol}${value.toStringAsFixed(1)}';
+    }
+    return '${currency.symbol}${value.toStringAsFixed(0)}';
   }
-  if (value >= 100000) {
-    return '₹${(value / 100000).toStringAsFixed(1)}L';
-  }
-  if (value >= 1000) {
-    final thousands = value / 1000;
-    final digits = thousands >= 10 ? 0 : 1;
-    return '₹${thousands.toStringAsFixed(digits)}k';
-  }
-  if (value < 10) {
-    return '₹${value.toStringAsFixed(2)}';
-  }
-  if (value < 100) {
-    return '₹${value.toStringAsFixed(1)}';
-  }
-  return '₹${value.toStringAsFixed(0)}';
+
+  final digits = value < 10 ? 2 : (value < 100 ? 1 : 0);
+  return NumberFormat.compactCurrency(
+    locale: currency.locale,
+    symbol: currency.symbol,
+    decimalDigits: digits,
+  ).format(value);
 }
 
 String formatShortDate(DateTime date) =>

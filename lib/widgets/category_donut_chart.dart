@@ -5,6 +5,7 @@ import '../models/expense_category.dart';
 import '../theme/app_colors.dart';
 import '../utils/category_ui.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 import 'chart_empty_state.dart';
 
 /// Category-wise donut chart built with `fl_chart`.
@@ -49,7 +50,7 @@ class CategoryDonutChart extends StatelessWidget {
 
     return Semantics(
       label:
-          'Spending by category, total ${formatCurrency(total)}. $description',
+          'Spending by category, total ${formatCurrency(total, currency: context.currency)}. $description',
       child: SizedBox(
         width: size,
         height: size,
@@ -94,7 +95,7 @@ class CategoryDonutChart extends StatelessWidget {
                   Text(
                     'TOTAL',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.textMuted,
+                      color: context.palette.textMuted,
                       letterSpacing: 1.1,
                       fontWeight: FontWeight.w700,
                     ),
@@ -105,10 +106,13 @@ class CategoryDonutChart extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        formatCompactCurrency(total),
+                        formatCompactCurrency(
+                          total,
+                          currency: context.currency,
+                        ),
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: AppColors.navy,
+                          color: context.palette.navy,
                         ),
                       ),
                     ),

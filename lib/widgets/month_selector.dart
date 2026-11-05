@@ -33,7 +33,7 @@ class MonthSelector extends StatelessWidget {
             onPressed: onPrevious,
             tooltip: 'Previous month',
             style: IconButton.styleFrom(
-              backgroundColor: AppColors.field,
+              backgroundColor: context.palette.field,
               shape: const CircleBorder(),
             ),
             icon: const Icon(Icons.chevron_left_rounded),
@@ -50,9 +50,11 @@ class MonthSelector extends StatelessWidget {
             onPressed: canGoNext ? onNext : null,
             tooltip: 'Next month',
             style: IconButton.styleFrom(
-              backgroundColor: canGoNext ? AppColors.field : AppColors.border,
+              backgroundColor: canGoNext
+                  ? context.palette.field
+                  : context.palette.border,
               shape: const CircleBorder(),
-              disabledForegroundColor: AppColors.textMuted,
+              disabledForegroundColor: context.palette.textMuted,
             ),
             icon: const Icon(Icons.chevron_right_rounded),
           ),

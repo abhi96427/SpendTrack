@@ -4,6 +4,7 @@ import '../models/expense.dart';
 import '../theme/app_colors.dart';
 import '../utils/category_ui.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 
 /// A single transaction row. The parent supplies card clipping and dividers.
 class ExpenseTile extends StatelessWidget {
@@ -28,7 +29,7 @@ class ExpenseTile extends StatelessWidget {
       button: true,
       label:
           '${expense.title}, ${expense.category.label}, '
-          '${formatCurrency(expense.amount)}, ${formatRelativeDate(expense.date)}',
+          '${formatCurrency(expense.amount, currency: context.currency)}, ${formatRelativeDate(expense.date)}',
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -68,7 +69,7 @@ class ExpenseTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.palette.textSecondary,
                         ),
                       ),
                     ],
@@ -76,18 +77,18 @@ class ExpenseTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  formatCurrency(expense.amount),
+                  formatCurrency(expense.amount, currency: context.currency),
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.palette.textPrimary,
                   ),
                 ),
                 if (showChevron) ...<Widget>[
                   const SizedBox(width: 4),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
                     size: 19,
-                    color: AppColors.textMuted,
+                    color: context.palette.textMuted,
                   ),
                 ],
               ],

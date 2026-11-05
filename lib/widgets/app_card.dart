@@ -27,12 +27,12 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(borderRadius);
     final decoration = BoxDecoration(
-      color: backgroundColor ?? AppColors.surface,
+      color: backgroundColor ?? context.palette.surface,
       borderRadius: radius,
-      border: Border.all(color: borderColor ?? AppColors.border),
+      border: Border.all(color: borderColor ?? context.palette.border),
       boxShadow: <BoxShadow>[
         BoxShadow(
-          color: AppColors.navy.withValues(alpha: 0.045),
+          color: context.palette.navy.withValues(alpha: 0.045),
           blurRadius: 24,
           offset: const Offset(0, 10),
         ),

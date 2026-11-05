@@ -4,6 +4,7 @@ import '../models/expense_category.dart';
 import '../theme/app_colors.dart';
 import '../utils/category_ui.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 
 /// Category totals rendered as icon, amount, percentage, and progress bar.
 class CategorySpendingList extends StatelessWidget {
@@ -34,14 +35,14 @@ class CategorySpendingList extends StatelessWidget {
             Container(
               width: 38,
               height: 38,
-              decoration: const BoxDecoration(
-                color: AppColors.field,
+              decoration: BoxDecoration(
+                color: context.palette.field,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.donut_large_rounded,
                 size: 18,
-                color: AppColors.textMuted,
+                color: context.palette.textMuted,
               ),
             ),
             const SizedBox(width: 12),
@@ -49,7 +50,7 @@ class CategorySpendingList extends StatelessWidget {
               child: Text(
                 emptyMessage,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.palette.textSecondary,
                 ),
               ),
             ),
@@ -126,7 +127,7 @@ class _CategoryRow extends StatelessWidget {
                   ),
                   if (showAmount)
                     Text(
-                      formatCurrency(amount),
+                      formatCurrency(amount, currency: context.currency),
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -144,7 +145,7 @@ class _CategoryRow extends StatelessWidget {
                         child: Stack(
                           fit: StackFit.expand,
                           children: <Widget>[
-                            Container(color: AppColors.border),
+                            Container(color: context.palette.border),
                             FractionallySizedBox(
                               widthFactor: percent.clamp(0.0, 1.0),
                               alignment: Alignment.centerLeft,
@@ -162,7 +163,7 @@ class _CategoryRow extends StatelessWidget {
                       '${(percent * 100).round()}%',
                       textAlign: TextAlign.right,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.palette.textSecondary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

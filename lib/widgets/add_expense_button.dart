@@ -22,7 +22,7 @@ class AddExpenseButton extends StatelessWidget {
         onPressed: onPressed,
         tooltip: tooltip,
         style: IconButton.styleFrom(
-          backgroundColor: AppColors.navy,
+          backgroundColor: context.palette.navy,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),

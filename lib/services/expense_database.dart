@@ -1,15 +1,17 @@
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import '../models/app_settings.dart';
 import '../models/expense.dart';
 import 'expense_repository.dart';
+import 'settings_repository.dart';
 
-/// SQLite-backed [ExpenseRepository].
+/// SQLite-backed [ExpenseRepository] and [SettingsRepository].
 ///
 /// The database is opened lazily on first use and reused afterwards. Every
 /// failure is translated into a [StorageException] with a message that is safe
 /// to show in the UI, while the original error is kept for diagnostics.
-class ExpenseDatabase implements ExpenseRepository {
+class ExpenseDatabase implements ExpenseRepository, SettingsRepository {
   ExpenseDatabase({DatabaseFactory? factory, String? databasePath})
     : _factory = factory ?? databaseFactory,
       _databasePath = databasePath;
@@ -20,8 +22,11 @@ class ExpenseDatabase implements ExpenseRepository {
   /// Table holding one row per expense.
   static const String tableName = 'expenses';
 
+  /// Key/value table holding user preferences.
+  static const String settingsTableName = 'app_settings';
+
   /// Bumped whenever the schema changes so [onUpgrade] can migrate data.
-  static const int schemaVersion = 1;
+  static const int schemaVersion = 2;
 
   final DatabaseFactory _factory;
 
@@ -72,6 +77,16 @@ class ExpenseDatabase implements ExpenseRepository {
       'CREATE INDEX idx_${tableName}_date '
       'ON $tableName (date DESC, created_at DESC)',
     );
+    await _createSettingsSchema(database);
+  }
+
+  Future<void> _createSettingsSchema(Database database) async {
+    await database.execute('''
+      CREATE TABLE $settingsTableName (
+        key TEXT PRIMARY KEY NOT NULL,
+        value TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<void> _upgradeSchema(
@@ -79,7 +94,9 @@ class ExpenseDatabase implements ExpenseRepository {
     int oldVersion,
     int newVersion,
   ) async {
-    // Only version 1 exists today. Future migrations belong here.
+    if (oldVersion < 2) {
+      await _createSettingsSchema(database);
+    }
   }
 
   @override
@@ -192,6 +209,49 @@ class ExpenseDatabase implements ExpenseRepository {
     } catch (error) {
       throw StorageException(
         'Unable to clear your expenses. Please try again.',
+        error,
+      );
+    }
+  }
+
+  @override
+  Future<AppSettings> loadSettings() async {
+    try {
+      final database = await _database;
+      final rows = await database.query(settingsTableName);
+      final values = <String, String?>{
+        for (final row in rows)
+          if (row['key'] is String && row['value'] is String)
+            row['key']! as String: row['value'] as String,
+      };
+      return AppSettings.fromMap(values);
+    } on StorageException {
+      rethrow;
+    } catch (error) {
+      throw StorageException(
+        'Unable to load your settings. Please try again.',
+        error,
+      );
+    }
+  }
+
+  @override
+  Future<void> saveSettings(AppSettings settings) async {
+    try {
+      final database = await _database;
+      await database.transaction((transaction) async {
+        for (final entry in settings.toMap().entries) {
+          await transaction.insert(settingsTableName, <String, Object?>{
+            'key': entry.key,
+            'value': entry.value,
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      });
+    } on StorageException {
+      rethrow;
+    } catch (error) {
+      throw StorageException(
+        'Unable to save your settings. Please try again.',
         error,
       );
     }

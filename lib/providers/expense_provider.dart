@@ -195,6 +195,14 @@ class ExpenseProvider extends ChangeNotifier {
     return _commit(updated, () => _repository.deleteExpense(id));
   }
 
+  /// Removes every stored expense after the UI has confirmed the action.
+  Future<bool> clearExpenses() {
+    if (_expenses.isEmpty) {
+      return Future<bool>.value(true);
+    }
+    return _commit(const <Expense>[], _repository.clearExpenses);
+  }
+
   void clearError() {
     if (_errorMessage == null) {
       return;

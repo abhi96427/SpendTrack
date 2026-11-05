@@ -6,6 +6,7 @@ import '../models/expense_category.dart';
 import '../providers/expense_provider.dart';
 import '../theme/app_colors.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 import '../widgets/add_expense_button.dart';
 import '../widgets/app_card.dart';
 import '../widgets/category_donut_chart.dart';
@@ -217,6 +218,10 @@ class _MonthlyTotalCard extends StatelessWidget {
     final change = _ChangeSummary.from(
       total: total,
       previousTotal: previousTotal,
+      accent: context.palette.accent,
+      secondary: context.palette.textSecondary,
+      danger: context.palette.danger,
+      success: context.palette.success,
     );
     final transactionLabel = count == 1
         ? '1 transaction'
@@ -228,14 +233,14 @@ class _MonthlyTotalCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppColors.navy, AppColors.navyDeep],
+          colors: <Color>[context.palette.brand, context.palette.brandDeep],
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.22),
+            color: context.palette.navy.withValues(alpha: 0.22),
             blurRadius: 26,
             offset: const Offset(0, 12),
           ),
@@ -301,7 +306,7 @@ class _MonthlyTotalCard extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      formatCurrency(total),
+                      formatCurrency(total, currency: context.currency),
                       style: theme.textTheme.displaySmall?.copyWith(
                         color: Colors.white,
                         fontSize: 38,
@@ -336,7 +341,7 @@ class _MonthlyTotalCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Prev ${formatCompactCurrency(previousTotal)}',
+                        'Prev ${formatCompactCurrency(previousTotal, currency: context.currency)}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: Colors.white.withValues(alpha: 0.5),
                         ),
@@ -371,23 +376,27 @@ class _ChangeSummary extends StatelessWidget {
   static _ChangeSummary? from({
     required double total,
     required double previousTotal,
+    required Color accent,
+    required Color secondary,
+    required Color danger,
+    required Color success,
   }) {
     if (previousTotal <= 0) {
       if (total <= 0) {
         return null;
       }
-      return const _ChangeSummary(
+      return _ChangeSummary(
         label: 'First month with recorded spending',
-        color: AppColors.accent,
+        color: accent,
         icon: Icons.auto_awesome_rounded,
       );
     }
 
     final change = ((total - previousTotal) / previousTotal) * 100;
     if (change.abs() < 0.05) {
-      return const _ChangeSummary(
+      return _ChangeSummary(
         label: 'Same as last month',
-        color: AppColors.textSecondary,
+        color: secondary,
         icon: Icons.remove_rounded,
       );
     }
@@ -396,7 +405,7 @@ class _ChangeSummary extends StatelessWidget {
     final sign = isIncrease ? '+' : '';
     return _ChangeSummary(
       label: '$sign${change.toStringAsFixed(1)}% vs last month',
-      color: isIncrease ? AppColors.danger : AppColors.success,
+      color: isIncrease ? danger : success,
       icon: isIncrease
           ? Icons.trending_up_rounded
           : Icons.trending_down_rounded,

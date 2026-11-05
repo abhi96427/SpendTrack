@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../models/month_total.dart';
 import '../theme/app_colors.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 import 'app_card.dart';
 import 'chart_empty_state.dart';
 
@@ -55,7 +56,7 @@ class MonthlyBarChart extends StatelessWidget {
     final description = months
         .map(
           (item) =>
-              '${formatMonthYear(item.month)}: ${formatCurrency(item.total)}',
+              '${formatMonthYear(item.month)}: ${formatCurrency(item.total, currency: context.currency)}',
         )
         .join(', ');
 
@@ -85,18 +86,21 @@ class MonthlyBarChart extends StatelessWidget {
                       toY: item.total,
                       width: 22,
                       color: isHighlighted
-                          ? AppColors.accent
-                          : AppColors.navy.withValues(alpha: 0.16),
+                          ? context.palette.accent
+                          : context.palette.navy.withValues(alpha: 0.16),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(7),
                         bottom: Radius.circular(3),
                       ),
                       label: BarChartRodLabel(
                         show: isHighlighted && item.total > 0,
-                        text: formatCompactCurrency(item.total),
+                        text: formatCompactCurrency(
+                          item.total,
+                          currency: context.currency,
+                        ),
                         offset: const Offset(0, 7),
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppColors.navy,
+                          color: context.palette.navy,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -108,7 +112,7 @@ class MonthlyBarChart extends StatelessWidget {
                 drawVerticalLine: false,
                 horizontalInterval: gridInterval,
                 getDrawingHorizontalLine: (_) => FlLine(
-                  color: AppColors.border.withValues(alpha: 0.9),
+                  color: context.palette.border.withValues(alpha: 0.9),
                   strokeWidth: 1,
                 ),
               ),
@@ -129,10 +133,13 @@ class MonthlyBarChart extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.only(right: 6),
                         child: Text(
-                          formatCompactCurrency(value),
+                          formatCompactCurrency(
+                            value,
+                            currency: context.currency,
+                          ),
                           textAlign: TextAlign.right,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: AppColors.textMuted,
+                            color: context.palette.textMuted,
                             fontSize: 10,
                           ),
                         ),
@@ -161,8 +168,8 @@ class MonthlyBarChart extends StatelessWidget {
                           formatShortMonth(month),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: isHighlighted
-                                ? AppColors.navy
-                                : AppColors.textMuted,
+                                ? context.palette.navy
+                                : context.palette.textMuted,
                             fontWeight: isHighlighted
                                 ? FontWeight.w800
                                 : FontWeight.w600,
@@ -176,7 +183,7 @@ class MonthlyBarChart extends StatelessWidget {
               ),
               barTouchData: BarTouchData(
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (_) => AppColors.navy,
+                  getTooltipColor: (_) => context.palette.navy,
                   tooltipBorderRadius: BorderRadius.circular(10),
                   tooltipPadding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -187,7 +194,7 @@ class MonthlyBarChart extends StatelessWidget {
                     final item = months[group.x];
                     return BarTooltipItem(
                       '${formatMonthYear(item.month)}\n'
-                      '${formatCurrency(item.total)}',
+                      '${formatCurrency(item.total, currency: context.currency)}',
                       theme.textTheme.labelSmall?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,

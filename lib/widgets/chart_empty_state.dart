@@ -38,11 +38,11 @@ class ChartEmptyState extends StatelessWidget {
                 Container(
                   width: 46,
                   height: 46,
-                  decoration: const BoxDecoration(
-                    color: AppColors.field,
+                  decoration: BoxDecoration(
+                    color: context.palette.field,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, size: 22, color: AppColors.textMuted),
+                  child: Icon(icon, size: 22, color: context.palette.textMuted),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -57,7 +57,7 @@ class ChartEmptyState extends StatelessWidget {
                   message,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.palette.textSecondary,
                     height: 1.35,
                   ),
                 ),

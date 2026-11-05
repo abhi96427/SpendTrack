@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
+import 'package:spendtrack/models/app_currency.dart';
+import 'package:spendtrack/models/app_settings.dart';
 import 'package:spendtrack/models/expense.dart';
 import 'package:spendtrack/models/expense_category.dart';
 import 'package:spendtrack/services/expense_database.dart';
@@ -138,6 +140,24 @@ void main() {
       await database.clearExpenses();
 
       expect(await database.loadExpenses(), isEmpty);
+    });
+
+    test('persists settings across database reopen', () async {
+      const settings = AppSettings(
+        themeMode: AppThemeMode.dark,
+        currency: AppCurrency.usd,
+      );
+      expect(await database.loadSettings(), AppSettings.defaults);
+      await database.saveSettings(settings);
+      expect(await database.loadSettings(), settings);
+      await database.close();
+
+      final reopened = ExpenseDatabase(
+        factory: databaseFactoryFfi,
+        databasePath: databasePath,
+      );
+      addTearDown(reopened.close);
+      expect(await reopened.loadSettings(), settings);
     });
 
     test('reports duplicate ids as a storage error', () async {

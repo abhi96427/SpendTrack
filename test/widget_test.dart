@@ -393,6 +393,64 @@ void main() {
       expect(find.text('Old electricity bill'), findsNothing);
     });
 
+    testWidgets('settings confirms and clears all saved expenses', (
+      WidgetTester tester,
+    ) async {
+      final storage = FakeExpenseStorage(
+        initial: <Expense>[
+          _expense(
+            id: 'one',
+            title: 'Coffee',
+            amount: 80,
+            category: ExpenseCategory.food,
+          ),
+        ],
+      );
+      await _pumpApp(tester, storage);
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('settings-list')), findsOneWidget);
+      expect(find.text('Local SQLite database'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('settings-clear-expenses')));
+      await tester.pumpAndSettle();
+      expect(find.text('Clear all expenses?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(storage.stored, hasLength(1));
+
+      await tester.tap(find.byKey(const Key('settings-clear-expenses')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('settings-clear-confirm')));
+      await tester.pumpAndSettle();
+      expect(storage.stored, isEmpty);
+      expect(find.text('All expenses cleared.'), findsOneWidget);
+    });
+
+    testWidgets('settings changes theme and currency', (
+      WidgetTester tester,
+    ) async {
+      await _pumpApp(tester, FakeExpenseStorage());
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('settings-theme-select')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Dark').last);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+        ThemeMode.dark,
+      );
+
+      await tester.tap(find.byKey(const Key('settings-currency-select')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('USD').last);
+      await tester.pumpAndSettle();
+      expect(find.text('USD · US Dollar'), findsOneWidget);
+      expect(find.textContaining(r'$1,234.56'), findsOneWidget);
+    });
+
     testWidgets('summary uses real totals, charts, and month navigation', (
       WidgetTester tester,
     ) async {

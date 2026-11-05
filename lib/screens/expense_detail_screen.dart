@@ -6,6 +6,7 @@ import '../providers/expense_provider.dart';
 import '../theme/app_colors.dart';
 import '../utils/category_ui.dart';
 import '../utils/formatters.dart';
+import '../utils/currency_context.dart';
 import '../widgets/app_card.dart';
 import '../widgets/section_header.dart';
 import 'expense_form_screen.dart';
@@ -68,7 +69,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
         return AlertDialog(
           title: const Text('Delete expense?'),
           content: Text(
-            '"${expense.title}" (${formatCurrency(expense.amount)}) will be '
+            '"${expense.title}" (${formatCurrency(expense.amount, currency: context.currency)}) will be '
             'removed permanently. This cannot be undone.',
           ),
           actions: <Widget>[
@@ -78,7 +79,9 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+              style: TextButton.styleFrom(
+                foregroundColor: context.palette.danger,
+              ),
               child: const Text('Delete'),
             ),
           ],
@@ -136,7 +139,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
               key: const Key('detail-edit-button'),
               onPressed: _isDeleting ? null : () => _edit(expense),
               tooltip: 'Edit expense',
-              icon: const Icon(Icons.edit_rounded),
+              icon: Icon(Icons.edit_rounded),
             ),
           const SizedBox(width: 4),
         ],
@@ -167,14 +170,14 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                         const Divider(indent: 44),
                         _DetailRow(
                           icon: Icons.calendar_today_rounded,
-                          iconColor: AppColors.accent,
+                          iconColor: context.palette.accent,
                           label: 'Date',
                           value: formatFullDate(expense.date),
                         ),
                         const Divider(indent: 44),
                         _DetailRow(
                           icon: Icons.notes_rounded,
-                          iconColor: AppColors.textSecondary,
+                          iconColor: context.palette.textSecondary,
                           label: 'Note',
                           value: expense.note ?? 'No note added',
                           valueMuted: expense.note == null,
@@ -182,7 +185,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                         const Divider(indent: 44),
                         _DetailRow(
                           icon: Icons.schedule_rounded,
-                          iconColor: AppColors.textSecondary,
+                          iconColor: context.palette.textSecondary,
                           label: 'Recorded',
                           value: formatShortDate(expense.createdAt),
                         ),
@@ -193,7 +196,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                   FilledButton.icon(
                     key: const Key('detail-edit-filled-button'),
                     onPressed: _isDeleting ? null : () => _edit(expense),
-                    icon: const Icon(Icons.edit_rounded, size: 19),
+                    icon: Icon(Icons.edit_rounded, size: 19),
                     label: const Text('Edit expense'),
                   ),
                   const SizedBox(height: 10),
@@ -201,10 +204,10 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                     key: const Key('detail-delete-button'),
                     onPressed: _isDeleting ? null : () => _delete(expense),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.danger,
+                      foregroundColor: context.palette.danger,
                       minimumSize: const Size.fromHeight(52),
                       side: BorderSide(
-                        color: AppColors.danger.withValues(alpha: 0.35),
+                        color: context.palette.danger.withValues(alpha: 0.35),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
@@ -218,7 +221,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                             height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Icon(Icons.delete_outline_rounded, size: 20),
+                        : Icon(Icons.delete_outline_rounded, size: 20),
                     label: Text(_isDeleting ? 'Deleting...' : 'Delete expense'),
                   ),
                 ],
@@ -240,14 +243,14 @@ class _DetailHero extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[AppColors.navy, AppColors.navyDeep],
+          colors: <Color>[context.palette.brand, context.palette.brandDeep],
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.2),
+            color: context.palette.navy.withValues(alpha: 0.2),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -306,7 +309,7 @@ class _DetailHero extends StatelessWidget {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
-                formatCurrency(expense.amount),
+                formatCurrency(expense.amount, currency: context.currency),
                 style: theme.textTheme.displaySmall?.copyWith(
                   color: Colors.white,
                   fontSize: 38,
@@ -363,7 +366,7 @@ class _DetailRow extends StatelessWidget {
                 Text(
                   label,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: context.palette.textMuted,
                     letterSpacing: 0.4,
                   ),
                 ),
@@ -372,8 +375,8 @@ class _DetailRow extends StatelessWidget {
                   value,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: valueMuted
-                        ? AppColors.textMuted
-                        : AppColors.textPrimary,
+                        ? context.palette.textMuted
+                        : context.palette.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -399,10 +402,10 @@ class _RemovedExpenseView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(
+            Icon(
               Icons.receipt_long_rounded,
               size: 40,
-              color: AppColors.textMuted,
+              color: context.palette.textMuted,
             ),
             const SizedBox(height: 14),
             Text(
@@ -415,7 +418,7 @@ class _RemovedExpenseView extends StatelessWidget {
               'It may have been deleted from another screen.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: context.palette.textSecondary,
               ),
             ),
             const SizedBox(height: 18),

@@ -20,23 +20,25 @@ class ErrorBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
       decoration: BoxDecoration(
-        color: AppColors.dangerSoft,
+        color: context.palette.dangerSoft,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.danger.withValues(alpha: 0.15)),
+        border: Border.all(
+          color: context.palette.danger.withValues(alpha: 0.15),
+        ),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(
+          Icon(
             Icons.error_outline_rounded,
             size: 20,
-            color: AppColors.danger,
+            color: context.palette.danger,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.danger,
+                color: context.palette.danger,
               ),
             ),
           ),
@@ -44,10 +46,10 @@ class ErrorBanner extends StatelessWidget {
             onPressed: onDismiss,
             tooltip: 'Dismiss',
             visualDensity: VisualDensity.compact,
-            icon: const Icon(
+            icon: Icon(
               Icons.close_rounded,
               size: 18,
-              color: AppColors.danger,
+              color: context.palette.danger,
             ),
           ),
         ],
