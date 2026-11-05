@@ -167,6 +167,7 @@ The automated suite covers expense and settings persistence, database reopen beh
   - Monthly and category-wise analytics
   - Charts and graphical reports
   - Testing, bug fixing and documentation
+  - Preparation and maintenance of project documentation and test records
 
 ## Repository and security notes
 
